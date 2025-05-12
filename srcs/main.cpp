@@ -7,6 +7,9 @@
 /*
  * @Forbidden Stuff:
  * - if fcntl() is used, it only can be use like this: fcntl(fd, F_SETFL, O_NONBLOCK)
+ * - poll() or equivalent is mandatory ("Ainsi, si vous essayez d’utiliser read/recv ou write/send avec
+		n’importe quel FD sans utiliser poll() (ou équivalent), votre note
+		sera de 0.")
  * etc...
 */
 
