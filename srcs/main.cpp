@@ -1,21 +1,22 @@
+#include "debug.hpp"
 #include "irc.hpp"
 
 /* @Usage:
  * /ircserv <port> <password>
 */
 
-/*
- * @Forbidden Stuff:
- * - if fcntl() is used, it only can be use like this: fcntl(fd, F_SETFL, O_NONBLOCK)
- * - poll() or equivalent is mandatory ("Ainsi, si vous essayez d’utiliser read/recv ou write/send avec
-		n’importe quel FD sans utiliser poll() (ou équivalent), votre note
-		sera de 0.")
- * etc...
-*/
+void	test(bool val){
+	if (val) DEBUG_THROW("pas cool");
+}
 
 int main(UNUSED int argc, UNUSED char **argv){
+	try{
+		test(0);
+	}catch(const std::exception &e){
+		std::cerr << e.what() << std::endl;
+	}
 	if (argc != 3){
-		std::cerr << "ARGS ERROR" << std::endl;
+		std::cerr << "ARGS ERROR at: " << __LINE__ << " in: " << __FILE__ <<std::endl;
 		return (1);
 	}
 }

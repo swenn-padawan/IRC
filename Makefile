@@ -6,7 +6,17 @@ NAME		:= ircserv
 
 CC			:=	c++
 
-CFLAGS		:= -Wall -Wextra -Werror -std=c++98 #-g
+CFLAGS		:= -Wall -Wextra -Werror -std=c++98
+
+DEBUG		?=	0
+
+ifeq ($(DEBUG), 1)
+	CFLAGS += -DDEBUG_BUILD
+endif
+
+ifeq ($(LAZY), 1)
+	CFLAGS		:= -Wall -Wextra -std=c++98
+endif
 
 IFLAGS		:=	-I ./includes
 
