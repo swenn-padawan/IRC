@@ -16,11 +16,9 @@
 */
 
 # include <iostream>
+
+# include "macro.hpp"
 # include "server.hpp"
 # include "client.hpp"
+# include "debug.hpp"
 
-#if __has_attribute(unused)
-#	define UNUSED __attribute__((unused))
-#else
-#	define UNUSED
-#endif

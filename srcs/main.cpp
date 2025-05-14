@@ -1,4 +1,3 @@
-#include "debug.hpp"
 #include "irc.hpp"
 
 /* @Usage:
@@ -6,17 +5,13 @@
 */
 
 void	test(bool val){
-	if (val) DEBUG_THROW("pas cool");
+	UNUSED(val);
+	IRC_LOG("test poll");
+	IRC_WARN("oulala");
 }
 
-int main(UNUSED int argc, UNUSED char **argv){
-	try{
-		test(0);
-	}catch(const std::exception &e){
-		std::cerr << e.what() << std::endl;
-	}
-	if (argc != 3){
-		std::cerr << "ARGS ERROR at: " << __LINE__ << " in: " << __FILE__ <<std::endl;
-		return (1);
-	}
+int main(int argc, char **argv){
+	UNUSED(argc);
+	UNUSED(argv);
+	test(1);
 }

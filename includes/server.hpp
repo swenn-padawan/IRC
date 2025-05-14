@@ -15,7 +15,6 @@
  * [ ] - Handle Signals
 */
 
-# include "macro.hpp"
 # include <poll.h>
 # include <signal.h>
 # include <sys/socket.h>

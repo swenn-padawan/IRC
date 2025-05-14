@@ -8,10 +8,10 @@ CC			:=	c++
 
 CFLAGS		:= -Wall -Wextra -Werror -std=c++98
 
-DEBUG		?=	0
+VERBOSE		?=	0
 
-ifeq ($(DEBUG), 1)
-	CFLAGS += -DDEBUG_BUILD
+ifeq ($(VERBOSE), 1)
+	CFLAGS += -DVERBOSE
 endif
 
 ifeq ($(LAZY), 1)
