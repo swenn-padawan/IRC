@@ -4,18 +4,14 @@
  * /ircserv <port> <password>
 */
 
-/*
- * @Forbidden Stuff:
- * - if fcntl() is used, it only can be use like this: fcntl(fd, F_SETFL, O_NONBLOCK)
- * - poll() or equivalent is mandatory ("Ainsi, si vous essayez d’utiliser read/recv ou write/send avec
-		n’importe quel FD sans utiliser poll() (ou équivalent), votre note
-		sera de 0.")
- * etc...
-*/
+void	test(bool val){
+	UNUSED(val);
+	IRC_LOG("test poll");
+	IRC_WARN("oulala");
+}
 
-int main(UNUSED int argc, UNUSED char **argv){
-	if (argc != 3){
-		std::cerr << "ARGS ERROR" << std::endl;
-		return (1);
-	}
+int main(int argc, char **argv){
+	UNUSED(argc);
+	UNUSED(argv);
+	test(1);
 }

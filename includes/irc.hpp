@@ -4,38 +4,21 @@
  * @Sources:
  * https://modern.ircdocs.horse/
  *
- *
 */
 
+/*
+ * @Forbidden Stuff:
+ * - if fcntl() is used, it only can be use like this: fcntl(fd, F_SETFL, O_NONBLOCK)
+ * - poll() or equivalent is mandatory ("Ainsi, si vous essayez d’utiliser read/recv ou write/send avec
+		n’importe quel FD sans utiliser poll() (ou équivalent), votre note
+		sera de 0.") Voir Sujet: page 6
+ * etc...
+*/
 
 # include <iostream>
 
-#define UNUSED __attribute__((unused))
-
-/*
- * @brief:
- * This are MACROS to generate GET and SET functions
- *
-*/
-
-#define GETTER(field_type, field_name) \
-	field_type get_##field_name() const {return field_name;}
-
-#define SETTER(field_type, field_name) \
-    void set_##field_name(field_type value) { field_name = value; }
-
-/*
- * @exemple:
- *
-class test{
-	private:
-		std::string name;
-
-	public:
-		test();
-		~test();
-		GETTER(std::string, name);
-		SETTER(std::string, name);
-};
-*/
+# include "macro.hpp"
+# include "server.hpp"
+# include "client.hpp"
+# include "debug.hpp"
 

@@ -6,7 +6,17 @@ NAME		:= ircserv
 
 CC			:=	c++
 
-CFLAGS		:= -Wall -Wextra -Werror -std=c++98 #-g
+CFLAGS		:= -Wall -Wextra -Werror -std=c++98
+
+VERBOSE		?=	0
+
+ifeq ($(VERBOSE), 1)
+	CFLAGS += -DVERBOSE
+endif
+
+ifeq ($(LAZY), 1)
+	CFLAGS		:= -Wall -Wextra -std=c++98
+endif
 
 IFLAGS		:=	-I ./includes
 
