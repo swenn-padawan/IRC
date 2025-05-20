@@ -54,15 +54,49 @@ Elles sont benefiques pour que Hexchat comprennent ce qu'il se passe. Voir 5.Rep
 Les messages IRC se terminent tous par un CR-LF (Carriage Return-Line Feed) "crlf       =  %x0D %x0A   ; "carriage return" "linefeed""
 Ces messages ne DOIVENT pas exceder 512 caracteres
  
-#### 2.3.1 Format in ABNF
+##### 2.3.1 Format in ABNF
 (ABNF est une maniere de decrire une grammaire synthaxique)
 Je vais pas ecrire toutes la liste sonc elle est page 7 (du lien)
 
+#### 2.4 Numeric Replies
+La plupart des messages envoye au serveur generent une reponse.
+La plus commune est la reponse numerique, utilisees a la fois pour les erreurs et en temps normals.
+La reponse numerique DOIT etre envoye en un message:
+le prefix de l'envoyeur, les 3 digits, et la distination.
+Une reponse numerique n'est pas autorisee si elle vient d'un client
+Pour resume une reponse numerique est comme un message normal mais avec des digits a la place d'un mot
+
 ### 3 Message Details
+Toutes les commandes decrites dans cette section DOIVENT etre implementees.
+Quand l'erreur ERR_NOSUCHSERVER est retourner ca veut dire que la destination n'a pas pu etre trouver.
+Le serveur NE DOIT PAS envoyer d'autres reponses apres cette erreur pour cette commande.
+Exemple: le client envoie:
+    WHOIS autre.serveur.net swenn
+si le serveur IRC ne connait pas autre.serveur.net
+le serveur envoie:
+    :ton.serveur.net 402 swenn autre.serveur.net :No such server
 
+Meme si on gere pas la communication entre serveur, le client peut tenter quand meme.
 
+Si plusieurs parametres sont present, chaque parametres doivent etre verifies et chaque erreurs doit etre specifies:
+Je cite: "If multiple parameters is presented, then each MUST be checked for
+   validity and appropriate responses MUST be sent back to the client.
+   In the case of incorrect messages which use parameter lists with
+   comma as an item separator, a reply MUST be sent for each item."
 
+#### 3.1 Connection Registration
+Une commande PASS n'est pas obligatoire pour que la connection du client soit enregistree,
+mais elle doit etre precedee des commandes NICK/USER.
+L'ordre conseille des commandes pour la connection d'un user est la suivante:
+                            1. Pass message
+           2. Nick message                  2. Service message
+           3. User message
 
+Si la commande reussi, le user recevra un RPL_WELCOME message indiquant que la connction a bien eu lieu et est connu de tout le serveur IRC.
+Le message doit contenir le nom sous lequel le user s'est identifier
 
+##### 3.1.1 Password message
+Command: PASS
+parametres: /<password/>
 
 
