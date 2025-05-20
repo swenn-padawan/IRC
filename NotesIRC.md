@@ -97,7 +97,7 @@ Le message doit contenir le nom sous lequel le user s'est identifier
 
 Les sous chapitres qui suivent dans la doc sont faciles a lire, pa sla peine de les reecrire: (section 3.1.1 ou page10)
 
-#### Channel Operations
+#### 3.2 Channel Operations
 Toutes ces commandes doivent informes le user si la commande a produit une erreur, si elle a ete accordee, ou juste refusee.
 Precision: Une erreur peut etre synthaxique ou technique (une fonction qui foire genre send())
     tandis que le refus de la commande vient des permissions (join un channel prive sans invitation, kick alors que non operateur, etc..)
@@ -105,12 +105,57 @@ Precision: Une erreur peut etre synthaxique ou technique (une fonction qui foire
 Dans cette section il est mention non implicite d'une notion essentielle pour que le client (Hexchat) puisse fonctionner, l'echo de l'action.
 Exemple:    Le client envoie JOIN #salon
             Le serveur renvoie: :swenn!~user@host JOIN :#salon
-Et si la commande du client (swenn) prouit une erreur, le serveur ne renvoit pas l'action avec le prefixe, il envoie simplement un message d'erreur ou de refus,
+Et si la commande du client (swenn) produit une erreur, le serveur ne renvoit pas l'action avec le prefixe, il envoie simplement un message d'erreur ou de refus,
 et dans ce cas la le prefixe est le serveur est pas le user.
 
 Je n'ecrirais pas tout les codes d'erreurs de chaque commandes, ils sont disponibles a partir de la page16
 
-##### JOIN message
+Toutes les commandes a recoder:
+JOIN
+MODE
+KICK
+PART
+QUIT
+PRIVMSG
+NOTICE
+
+##### 3.2.1 JOIN message
+
+La commande JOIN sert a commencer a ecouter un channel
+
+Une fois qu'un user a rejoint le channel, il commence a recevoir toutes les commandes qui ont un impact sur ce channel.
+
+Si le JOIN a reussi, le user recoit un JOIN message en tant que confirmation,
+et ensuite le topic du channel en utilisant RPL_TOPIC et la liste des users du channels (RPL_NAMREPLY), qui DOIT contenir le user qui a rejoint.
+
+Cette commande a un argument special, le 0, cest une requete speciale pour quitter tout les channels rejoint par le user.
+Cette commande special agira comme si le user avait fair la commande PART dans chaque channels.
+
+Exemple: JOIN #foo,#bar fubar,foobar     ; Command to join channel #foo using
+                                            key "fubar", and channel #bar using
+                                            key "foobar".
+
+##### 3.2.2 PART message
+
+La commande PART fait quitter au user le channel courant
+
+
+Exemple: 
+PART #oz-ops,&group5            ; Command to leave both channels
+                                   "&group5" and "#oz-ops".
+
+Je cite: "Servers MUST be able to parse arguments in the form of a list of
+            target, but SHOULD NOT use lists when sending PART messages to clients."
+
+Ca veut dire que le serveur peut accepter une liste de channel a quitter, mais il ne doit pas renvoyer une liste, il doit renvoyer plusieurs PART.
+Exemple:
+Le user envoie:
+    PART #salon1,#salon2
+Le serveur repond par:
+    :swenn!user@host PART #salon1
+    :swenn!user@host PART #salon2
+
+##### 3.2.3 channel mode message
 
 
 
