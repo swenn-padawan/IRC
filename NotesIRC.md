@@ -96,7 +96,9 @@ Si la commande reussi, le user recevra un RPL_WELCOME message indiquant que la c
 Le message doit contenir le nom sous lequel le user s'est identifier
 
 ##### 3.1.1 Password message
-Command: PASS
-parametres: /<password/>
+Command: PASS \
+parametres: /<password>
+
+
 
 
