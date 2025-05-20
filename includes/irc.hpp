@@ -21,4 +21,9 @@
 # include "server.hpp"
 # include "client.hpp"
 # include "debug.hpp"
+#include <errno.h>
+#include <cstdlib>
+#include <fcntl.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
 

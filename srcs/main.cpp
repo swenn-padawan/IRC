@@ -1,17 +1,16 @@
+#include "debug.hpp"
 #include "irc.hpp"
 
 /* @Usage:
  * /ircserv <port> <password>
 */
 
-void	test(bool val){
-	UNUSED(val);
-	IRC_LOG("test poll");
-	IRC_WARN("oulala");
-}
-
 int main(int argc, char **argv){
-	UNUSED(argc);
-	UNUSED(argv);
-	test(1);
+	if (argc != 3){
+		std::cerr << "Error: IRC: Not enought argument\n";
+		return (1);
+	}
+	try{
+		Server server(argv[1], argv[2]);
+	}IRC_CATCH;
 }
