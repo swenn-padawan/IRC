@@ -1,6 +1,6 @@
 ### Notes Normes IRC
-*source: https://www.rfcreader.com/#rfc2812*
-
+*source: https://www.rfcreader.com/#rfc2812* 
+    ps: chaque reference a des pages/section parle de ce lien ^
 ### 1 Labels
 
 #### 1.2.1 Users 
@@ -95,9 +95,22 @@ L'ordre conseille des commandes pour la connection d'un user est la suivante:
 Si la commande reussi, le user recevra un RPL_WELCOME message indiquant que la connction a bien eu lieu et est connu de tout le serveur IRC.
 Le message doit contenir le nom sous lequel le user s'est identifier
 
-##### 3.1.1 Password message
-Command: PASS \
-parametres: /<password>
+Les sous chapitres qui suivent dans la doc sont faciles a lire, pa sla peine de les reecrire: (section 3.1.1 ou page10)
+
+#### Channel Operations
+Toutes ces commandes doivent informes le user si la commande a produit une erreur, si elle a ete accordee, ou juste refusee.
+Precision: Une erreur peut etre synthaxique ou technique (une fonction qui foire genre send())
+    tandis que le refus de la commande vient des permissions (join un channel prive sans invitation, kick alors que non operateur, etc..)
+
+Dans cette section il est mention non implicite d'une notion essentielle pour que le client (Hexchat) puisse fonctionner, l'echo de l'action.
+Exemple:    Le client envoie JOIN #salon
+            Le serveur renvoie: :swenn!~user@host JOIN :#salon
+Et si la commande du client (swenn) prouit une erreur, le serveur ne renvoit pas l'action avec le prefixe, il envoie simplement un message d'erreur ou de refus,
+et dans ce cas la le prefixe est le serveur est pas le user.
+
+Je n'ecrirais pas tout les codes d'erreurs de chaque commandes, ils sont disponibles a partir de la page16
+
+##### JOIN message
 
 
 
