@@ -18,11 +18,12 @@ ifeq ($(LAZY), 1)
 	CFLAGS		:= -Wall -Wextra -std=c++98
 endif
 
-IFLAGS		:=	-I ./includes
+IFLAGS		:=	-I includes
 
 SRCS_DIR	:= srcs
 
 SRCS		:= main.cpp \
+			   IRCMessage.cpp \
 
 SRCS		:=	$(addprefix $(SRCS_DIR)/, $(SRCS))
 
