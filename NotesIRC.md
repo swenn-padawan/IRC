@@ -115,9 +115,10 @@ JOIN
 MODE  
 KICK  
 PART  
-QUIT  
+QUIT 
 PRIVMSG  
-NOTICE  
+NOTICE  (optionel)   
+TOPIC   (optionel)  
 
 ##### 3.2.1 JOIN message
 
@@ -156,6 +157,54 @@ Le serveur repond par:
 
 ##### 3.2.3 channel mode message
 
+La commande MODE sert a changer les modes des channels  
+Le '+' est une addition de privileges ou un ajout, tandis que le moins retire (ca sera plus simple dans l'exemple en dessous)  
+on doit coder les suivants:  
+- i (+i Defini le channel en invite only/ -i retire cette regle)
+- t (+t Defini les restriction de la commande TOPIC/ -t les enleves)
+- k (+k Defini la cle du canal, attend un mot de passe / -k la retire)
+- o (+o Donner le privilege de l'operateur/ -o les retires)
+- l (+l defini une limite de user dans le channel / -l la retire)
 
+Exemple:
+MODE #Finnish +o Kilroy         ; Command to give 'chanop' privileges  
+                                   to Kilroy on channel #Finnish.  
 
+   MODE #Finnish +v Wiz            ; Command to allow WiZ to speak on  
+                                   #Finnish.  
 
+   MODE #Fins -s                   ; Command to remove 'secret' flag  
+                                   from channel #Fins.  
+
+   MODE #42 +k oulu                ; Command to set the channel key to  
+                                   "oulu".  
+
+   MODE #42 -k oulu                ; Command to remove the "oulu"  
+                                   channel key on channel "#42".  
+
+   MODE #eu-opers +l 10            ; Command to set the limit for the  
+                                   number of users on channel  
+                                   "#eu-opers" to 10.  
+
+##### 3.2.4 Topic message
+
+ps: Topic = sujet
+
+La commande TOPIC est utilisee pour voir/changer le topic d'un channel
+
+Si il y a un parametre et que le user a les droits le topic change, si le topic est une chaine vide, le topic est supprime.  
+Si il n'y a pas de parametres alors le topic du channel est afficher.  
+
+Exemple:
+   TOPIC #test :another topic      ; Command to set the topic on #test  
+                                   to "another topic".  
+
+   TOPIC #test :                   ; Command to clear the topic on  
+                                   #test.  
+
+   TOPIC #test                     ; Command to check the topic for  
+                                   #test.  
+
+Les Seules commandes obligatoires sont celles listees au dessus (ligne 113), donc pas besoin de toutes les lister.
+
+En gros ya que ca, les 40 autres pages sont la description des erreurs
