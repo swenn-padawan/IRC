@@ -56,3 +56,4 @@ EXCEPTION(fcntlFailedException, "fcntl failed");
 EXCEPTION(acceptFailedException, "accept failed");
 EXCEPTION(sigException, "End of the server");
 EXCEPTION(convertionException, "Failed to convert the port");
+EXCEPTION(recvFailedException, "recv failed");

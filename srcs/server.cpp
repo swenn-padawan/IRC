@@ -1,3 +1,5 @@
+#include "server.hpp"
+#include "debug.hpp"
 #include "irc.hpp"
 #include <sys/poll.h>
 #include <sys/socket.h>
@@ -55,28 +57,34 @@ void	Server::servLoop(void){
 	sig.sa_flags = 0;
 	sigaction(SIGINT, &sig, NULL);
 	pfds.resize(nb_client + 1);
+	pfds[0].events = POLLIN;
+	pfds[0].fd = servSocket;
 	while (1){
-		pfds[0].events = POLLIN;
-		pfds[0].fd = servSocket;
 		poll(&pfds[0], nb_client + 1, 100);
 		for(int i = 0; i < nb_client + 1; i++){
 			if (pfds[i].revents & POLLIN){
 				if (i == 0){
-					struct pollfd new_client;
-					//parsing de la commande
-					new_client.fd = accept(servSocket, (struct sockaddr *)&address, &address_len);
-					if (new_client.fd == -1)
-						throw acceptFailedException();
-					new_client.events = POLLIN;
-					pfds.push_back(new_client);
-					IRC_LOG("client %d accepted", i);
+					struct pollfd newClient;
+					newClient.events = POLLIN;
+					newClient.fd = accept(servSocket, (struct sockaddr *)0, 0);
+					if (newClient.fd == -1) throw acceptFailedException();
+					pfds.push_back(newClient);
 					nb_client++;
+					IRC_OK("client %d connected", nb_client);
 				}
 				else{
-					//lire input client
 					char buffer[100];
-					read(pfds[i].fd, buffer, 100);
-					IRC_LOG("buffer = %s\n", buffer);
+					int bytes = recv(pfds[i].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
+					if (bytes == -1) throw recvFailedException();
+					if (bytes == 0){
+						pfds.erase(pfds.begin() + i);
+						nb_client--;
+						IRC_WARN("client %i disconnected", i);
+						i--;
+					}
+					buffer[bytes] = '\0';
+					IRC_LOG("client %i send -> %s", i, buffer);
+
 				}
 			}
 		}
