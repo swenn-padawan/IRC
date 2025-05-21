@@ -19,10 +19,12 @@
 #include <iostream>
 # include <poll.h>
 # include <signal.h>
+#include <sys/poll.h>
 # include <sys/socket.h>
 # include <unistd.h>
 # include <arpa/inet.h>
 # include <netinet/in.h> 
+#include <vector>
 
 #define MAX_CLIENT 128
 
@@ -35,6 +37,7 @@ class Server{
 		SETTER(std::string, password);
 		GETTER(int, port);
 		GETTER(std::string, password);
+		void	servLoop(void);
 
 	private:
 		int				port;
@@ -43,10 +46,13 @@ class Server{
 		struct sockaddr_in	address;
 		socklen_t		address_len;
 		int				ipServ;
+		std::vector<pollfd> pfds;
 };
 
-EXCEPTION(socketFailed, "socket failed");
-EXCEPTION(bindFailed, "bind failed");
-EXCEPTION(listenFailed, "listen failed");
-EXCEPTION(fcntlFailed, "fcntl failed");
-EXCEPTION(acceptFailed, "accept failed");
+EXCEPTION(socketFailedException, "socket failed");
+EXCEPTION(bindFailedException, "bind failed");
+EXCEPTION(listenFailedException, "listen failed");
+EXCEPTION(fcntlFailedException, "fcntl failed");
+EXCEPTION(acceptFailedException, "accept failed");
+EXCEPTION(sigException, "End of the server");
+EXCEPTION(convertionException, "Failed to convert the port");

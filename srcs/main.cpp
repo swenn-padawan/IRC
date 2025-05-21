@@ -12,5 +12,6 @@ int main(int argc, char **argv){
 	}
 	try{
 		Server server(argv[1], argv[2]);
+		server.servLoop();
 	}IRC_CATCH;
 }

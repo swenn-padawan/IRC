@@ -1,15 +1,22 @@
 #include "irc.hpp"
+#include <sys/poll.h>
+#include <sys/socket.h>
 
 Server::Server(){}
 
 Server::Server(char *port, char *password){
 	IRC_LOG("Server Created");
-	set_port(std::atoi(port));
+	long int	new_port;
+
+	new_port = std::strtol(port, &port, 10);
+	if (new_port == LONG_MIN || new_port == LONG_MAX || *port)
+		throw convertionException();
+	set_port(new_port);
 	set_password(password);
 	IRC_LOG("Port = %d | password = %s", this->port, this->password.c_str());
 	servSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (servSocket == -1)
-		throw socketFailed();
+		throw socketFailedException();
 	IRC_OK("socket() OK");
 	address_len = sizeof(struct sockaddr_in);
 	this->address.sin_family = AF_INET;
@@ -17,16 +24,61 @@ Server::Server(char *port, char *password){
 	this->address.sin_port = htons(this->port);
 	ipServ = bind(servSocket, (struct sockaddr *)&this->address, address_len);
 	if (ipServ == -1)
-		throw bindFailed();
+		throw bindFailedException();
 	IRC_OK("bind() OK");
 	if (fcntl(servSocket, F_SETFL, O_NONBLOCK) == -1)
-		throw fcntlFailed();
+		throw fcntlFailedException();
 	IRC_OK("fcntl() OK");
 	if (listen(servSocket, SOMAXCONN) == -1)
-		throw listenFailed();
+		throw listenFailedException();
 	IRC_OK("listen() OK");
+	IRC_OK("Server initialisation OK");
 }
 
 Server::~Server(){
 	IRC_LOG("Server has been deleted");
+}
+
+void	sig_handler(int sig){
+	UNUSED(sig);
+	//free
+	throw sigException();
+}
+
+void	Server::servLoop(void){
+	struct sigaction sig;
+	int	nb_client = 0;
+
+	memset(&sig, 0, sizeof(sig));
+	sig.sa_handler = sig_handler;
+	sigemptyset(&sig.sa_mask);
+	sig.sa_flags = 0;
+	sigaction(SIGINT, &sig, NULL);
+	pfds.resize(nb_client + 1);
+	while (1){
+		pfds[0].events = POLLIN;
+		pfds[0].fd = servSocket;
+		poll(&pfds[0], nb_client + 1, 100);
+		for(int i = 0; i < nb_client + 1; i++){
+			if (pfds[i].revents & POLLIN){
+				if (i == 0){
+					struct pollfd new_client;
+					//parsing de la commande
+					new_client.fd = accept(servSocket, (struct sockaddr *)&address, &address_len);
+					if (new_client.fd == -1)
+						throw acceptFailedException();
+					new_client.events = POLLIN;
+					pfds.push_back(new_client);
+					IRC_LOG("client %d accepted", i);
+					nb_client++;
+				}
+				else{
+					//lire input client
+					char buffer[100];
+					read(pfds[i].fd, buffer, 100);
+					IRC_LOG("buffer = %s\n", buffer);
+				}
+			}
+		}
+	}
 }
