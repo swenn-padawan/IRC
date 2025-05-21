@@ -1,140 +1,96 @@
 #include "IRCMessage.hpp"
 
-// Check if character is valid in command (letter)
 inline bool isCmdLetter(char c) 
 {
 	return std::isalpha(static_cast<unsigned char>(c)) != 0;
-}
-// Per ABNF: nospcrlfcl = %x01-09 / %x0B-0C / %x0E-1F / %x21-39 / %x3B-FF
-inline bool isSeparator(char c)
-{
-		return c != '\0' && c != '\r' && c != '\n' && c != ' ' && c != ':';
-}
-// Skip whitespace characters
-inline void skipWhitespace(const char* str, size_t& pos, const size_t len)
-{
-	while (pos < len && str[pos] == ' ') ++pos;
-}
-// Remove CRLF from the end of a string if present
-inline void removeCRLF(std::string& str)
-{
-	size_t len = str.length();
-	if (len >= 2 && str[len-2] == '\r' && str[len-1] == '\n')
-		str.resize(len - 2);
 }
 
 IRCMessage::~IRCMessage() {}
 
 IRCMessage::IRCMessage() : _prefix(""),
-	_command(""), _trailing(""), _params(), _hasTrailing(false) {}
+	_command(""), _params(), _hasTrailing(false) {}
 
-IRCMessage::IRCMessage(const std::string& raw_message) : _hasTrailing(false)
+IRCMessage::IRCMessage(const std::string &raw_message) : _hasTrailing(false)
 {
 	if (!parse(raw_message))
 		throw std::invalid_argument("Failed to parse IRC message");
 }
 
-bool IRCMessage::parse(const std::string& raw_message, IRCMessage& message)
+bool IRCMessage::parse(const std::string &raw_message, IRCMessage &message)
 {
 	message.clear();
 	return message.parse(raw_message);
 }
 
-// Clear message
 void IRCMessage::clear()
 {
 	_prefix.clear();
 	_command.clear();
 	_params.clear();
-	_trailing.clear();
+	_raw_message.clear();
 	_hasTrailing = false;
 }
 
-// Parse raw message
-bool IRCMessage::parse(const std::string& raw_message)
+bool IRCMessage::parse(const std::string &raw_message)
 {
-	clear();
-	const char* str = raw_message.c_str();
-	size_t pos = 0, len = raw_message.length();
-	// Skip any leading whitespace
-	skipWhitespace(str, pos, len);
-    // Parse prefix (optional)
-    // && Parse command (required)
-	// && Parse parameters (optional)
-	return ((pos >= len || str[pos] != ':' || parsePrefix(str, pos, len))
-			&& parseCommand(str, pos, len)
-			&& (pos >= len || parseParams(str, pos, len)));
-}
-
-// Parse prefix part
-bool IRCMessage::parsePrefix(const char* str, size_t& pos, const size_t len)
-{
-	// Skip the leading colon
-	size_t prefix_start = ++pos;
-	// Find the end of the prefix (next space)
-	while (pos < len && str[pos] != ' ')
-		pos++;	
-	if (pos > prefix_start)
-		_prefix = std::string(str + prefix_start, pos - prefix_start);
-	// Skip the space after the prefix
-	skipWhitespace(str, pos, len);
-	return true;
-}
-
-// Parse command part
-bool IRCMessage::parseCommand(const char* str, size_t& pos, const size_t len)
-{
-	size_t cmd_start = pos;	
-	// Command is letters
-	while (pos < len && isCmdLetter(str[pos]))
-		pos++;
-	// no valid command found
-	if (pos == cmd_start)
+	this->clear();
+	_raw_message = raw_message;
+	if (raw_message.empty())
 		return false;
-	_command = std::string(str + cmd_start, pos - cmd_start);
-	// Skip the space after the command
-	skipWhitespace(str, pos, len);
+	size_t pos = 0;
+	//skipWhitespace(str, pos, len);
+	return (parsePrefix(raw_message, pos)
+			&& parseCommand(raw_message, pos)
+			&& parseParams(raw_message, pos));
+}
+
+bool IRCMessage::parsePrefix(const std::string &str, size_t &pos)
+{
+	if (str[pos] != CHAR_PREFIX)
+		return true;
+	// Find the end of the prefix (next space)
+	size_t prefix_end = str.find(CHAR_SPACE, ++pos);
+	if (prefix_end == pos || prefix_end == std::string::npos)
+		return false;
+	_prefix = str.substr(pos, prefix_end - pos);
+	pos = prefix_end;
+	// Check for valid prefix ending with space
+	return pos != std::string::npos;
+}
+
+bool IRCMessage::parseCommand(const std::string &str, size_t& pos)
+{
+	// Skip skipWhitespace
+	pos = str.find_first_not_of(CHAR_SPACE, pos);
+	if (pos == std::string::npos)
+		return false;
+	size_t cmd_end = str.find_first_not_of(CHARSET_LETTERS, pos);
+	// no valid command found
+	if (pos == cmd_end)
+		return false;
+	_command = str.substr(pos, cmd_end - pos);
+	pos = str.find_first_not_of(CHAR_SPACE, cmd_end);
 	return true;
 }
 
-// Parse parameters part
-bool IRCMessage::parseParams(const char* str, size_t& pos, const size_t len)
+bool IRCMessage::parseParams(const std::string &str, size_t& pos)
 {
 	// Parse regular parameters (up to 14) and optionally a trailing parameter
-	while (pos < len)
+	while (pos != std::string::npos && _params.size() < 14)
 	{
 		// Check for trailing parameter (starts with ':')
-		if (str[pos] == ':') {
-			pos++; // Skip the colon
-			_trailing = std::string(str + pos, len - pos);
-			removeCRLF(_trailing);
-			_hasTrailing = true;
-			break;
-		}
-		// Regular parameter (middle)
-		size_t param_start = pos;
-		while (pos < len && str[pos] != ' ' && isSeparator(str[pos]))
-			pos++;
-		
-		if (pos > param_start)
-			_params.push_back(std::string(str + param_start, pos - param_start));	
-		// Skip the space after the parameter
-		skipWhitespace(str, pos, len);
-		
-		// IRC spec limits to 15 parameters (14 middle + trailing)
-		if (_params.size() >= 14)
+		size_t param_end = str.find_first_of(CHARSET_SEPARATOR, pos);
+		if (param_end > pos)
+			_params.push_back(str.substr(pos, param_end - pos));
+		pos = str.find_first_not_of(CHAR_SPACE, param_end);
+		if (str[pos] == CHAR_TRAILING)
 		{
-			// If we've already reached 14 params, the rest is trailing
-			if (pos < len) {
-				pos += str[pos] == ':'; // Skip the ":" if present
-				_trailing = std::string(str + pos, len - pos);
-				removeCRLF(_trailing);
-				_hasTrailing = true;
-			}
-			break;
+			_params.push_back(str.substr(++pos));
+			_hasTrailing = true;
+			return (pos != str.size());
 		}
 	}
-	return true;
+	return pos == std::string::npos;
 }
 
 // Get parameter by index
@@ -146,8 +102,8 @@ std::string IRCMessage::get_param(size_t index) const
 // Extract nickname from prefix
 std::string IRCMessage::get_nickname() const
 {
-	if (_prefix.empty()) return "";
-
+	if (_prefix.empty())
+		return "";
 	size_t pos = _prefix.find('!');
 	// If no '!', look for '@'
 	if (pos == std::string::npos)
@@ -162,8 +118,8 @@ std::string IRCMessage::get_nickname() const
 // Extract username from prefix
 std::string IRCMessage::get_username() const
 {
-	if (_prefix.empty()) return "";
-	
+	if (_prefix.empty())
+		return "";	
 	size_t excl_pos = _prefix.find('!');
 	// If no '!', no username
 	if (excl_pos == std::string::npos)
@@ -181,20 +137,4 @@ std::string IRCMessage::get_hostname() const
 		return "";	
 	size_t at_pos = _prefix.find('@');
 	return (at_pos == std::string::npos) ? "" : _prefix.substr(at_pos + 1);
-}
-
-// Format message to string
-std::string IRCMessage::toString(bool include_crlf) const
-{
-	std::string result;
-	if (!_prefix.empty())
-		result += ":" + _prefix + " ";
-	result += _command;
-	for (size_t i = 0; i < _params.size(); ++i)
-		result += " " + _params[i];
-	if (_hasTrailing)
-		result += " :" + _trailing;
-	if (include_crlf)
-		result += "\r\n";
-	return result;
 }

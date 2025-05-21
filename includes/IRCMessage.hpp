@@ -7,6 +7,12 @@
 
 #include "macro.hpp"
 
+#define CHAR_TRAILING ':'
+#define CHAR_PREFIX ':'
+#define CHAR_SPACE ' '
+#define CHARSET_CRLF "\r\n\0"
+#define CHARSET_SEPARATOR "\r\n: \0"
+#define CHARSET_LETTERS "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 /**
  * @class IRCMessage
  * @brief Represents a parsed IRC protocol message
@@ -16,11 +22,11 @@
  */
 class IRCMessage
 {
-GETTER_SETTER(IRCMessage, std::string, prefix);
-GETTER_SETTER(IRCMessage, std::string, command);
-GETTER_SETTER(IRCMessage, std::string, trailing, _hasTrailing = true;);
-GETTER(std::vector<std::string>, params);
-GETTER(bool, hasTrailing);
+	GETSET(IRCMessage, std::string, prefix);
+	GETSET(IRCMessage, std::string, command);
+	GETTER(std::vector<std::string>, params);
+	GETTER(std::string, raw_message);
+	GETTER(bool, hasTrailing);
 
 public:
 	IRCMessage();
@@ -48,13 +54,6 @@ public:
 	 */
 	static bool parse(const std::string& raw_message, IRCMessage& message);
 
-	/**
-	 * @brief Format message back to string representation
-	 * @param include_crlf Whether to append CRLF at the end
-	 * @return Formatted IRC message string
-	 */
-	std::string toString(bool include_crlf = true) const;
-
 	void clear();
 	std::string get_nickname() const;
 	std::string get_username() const;
@@ -63,7 +62,7 @@ public:
 
 private:
 	// Helper parsing methods
-	bool parsePrefix(const char* str, size_t& pos, const size_t len);
-	bool parseCommand(const char* str, size_t& pos, const size_t len);
-	bool parseParams(const char* str, size_t& pos, const size_t len);
+	bool parsePrefix(const std::string &str, size_t& pos);
+	bool parseCommand(const std::string &str, size_t& pos);
+	bool parseParams(const std::string &str, size_t& pos);
 };

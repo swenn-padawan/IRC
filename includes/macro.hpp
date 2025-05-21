@@ -1,6 +1,6 @@
 #pragma once
 
-#define GETTER_SETTER(cls, type, var, ...) \
+#define GETSET(cls, type, var, ...) \
 	private: type _##var; \
 	public: \
 	const type& get_##var() const {return _##var;} \
@@ -11,8 +11,7 @@
 	public: const type& get_##var() const {return _##var;} \
 
 #define SETTER(cls, type, var, ...) \
-	private: type _##var; \
-	public: cls& set_##var(type val) {_##var = val; __VA_ARGS__ return *this;} \
+	cls& set_##var(type val) {_##var = val; __VA_ARGS__ return *this;} \
 
 # define UNUSED(x) ((void)x)
 
