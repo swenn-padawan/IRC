@@ -12,7 +12,7 @@
 #define CHAR_SPACE ' '
 #define CHARSET_CRLF "\r\n\0"
 #define CHARSET_SEPARATOR "\r\n: \0"
-#define CHARSET_LETTERS "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define CHARSET_LETTERS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 /**
  * @class IRCMessage
  * @brief Represents a parsed IRC protocol message

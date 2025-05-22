@@ -1,10 +1,5 @@
 #include "IRCMessage.hpp"
 
-inline bool isCmdLetter(char c) 
-{
-	return std::isalpha(static_cast<unsigned char>(c)) != 0;
-}
-
 IRCMessage::~IRCMessage() {}
 
 IRCMessage::IRCMessage() : _prefix(""),
@@ -50,11 +45,10 @@ bool IRCMessage::parsePrefix(const std::string &str, size_t &pos)
 		return true;
 	// Find the end of the prefix (next space)
 	size_t prefix_end = str.find(CHAR_SPACE, ++pos);
-	if (prefix_end == pos || prefix_end == std::string::npos)
+	if (prefix_end == pos)
 		return false;
 	_prefix = str.substr(pos, prefix_end - pos);
 	pos = prefix_end;
-	// Check for valid prefix ending with space
 	return pos != std::string::npos;
 }
 
@@ -69,8 +63,8 @@ bool IRCMessage::parseCommand(const std::string &str, size_t& pos)
 	if (pos == cmd_end)
 		return false;
 	_command = str.substr(pos, cmd_end - pos);
-	pos = str.find_first_not_of(CHAR_SPACE, cmd_end);
-	return true;
+	pos = str.find_first_not_of(CHARSET_SEPARATOR, cmd_end);
+	return (pos != cmd_end || pos == std::string::npos);
 }
 
 bool IRCMessage::parseParams(const std::string &str, size_t& pos)
@@ -78,16 +72,15 @@ bool IRCMessage::parseParams(const std::string &str, size_t& pos)
 	// Parse regular parameters (up to 14) and optionally a trailing parameter
 	while (pos != std::string::npos && _params.size() < 14)
 	{
-		// Check for trailing parameter (starts with ':')
 		size_t param_end = str.find_first_of(CHARSET_SEPARATOR, pos);
 		if (param_end > pos)
 			_params.push_back(str.substr(pos, param_end - pos));
 		pos = str.find_first_not_of(CHAR_SPACE, param_end);
+		// Check for trailing parameter (starts with ':')
 		if (str[pos] == CHAR_TRAILING)
 		{
 			_params.push_back(str.substr(++pos));
-			_hasTrailing = true;
-			return (pos != str.size());
+			return (_hasTrailing=true);
 		}
 	}
 	return pos == std::string::npos;
