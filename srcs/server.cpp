@@ -71,9 +71,10 @@ void	Server::servLoop(void){
 					pfds.push_back(newClient);
 					nb_client++;
 					IRC_OK("client %d connected", nb_client);
+					send(newClient.fd, WELCOME, sizeof(WELCOME), MSG_DONTWAIT);
 				}
-				else{
-					char buffer[100];
+				else{ //TODO C^d (lol)
+					char buffer[255] = {0};
 					int bytes = recv(pfds[i].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
 					if (bytes == -1) throw recvFailedException();
 					if (bytes == 0){
@@ -81,6 +82,7 @@ void	Server::servLoop(void){
 						nb_client--;
 						IRC_WARN("client %i disconnected", i);
 						i--;
+						continue;
 					}
 					buffer[bytes] = '\0';
 					IRC_LOG("client %i send -> %s", i, buffer);

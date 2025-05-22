@@ -27,6 +27,7 @@
 #include <vector>
 
 #define MAX_CLIENT 128
+#define WELCOME "Welcome to Our IRC Chat, Please read the Documentation (RFC 2812)\n"
 
 class Server{
 	public:
