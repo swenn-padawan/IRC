@@ -3,6 +3,7 @@
 #include "irc.hpp"
 #include <sys/poll.h>
 #include <sys/socket.h>
+#include <utility>
 
 Server::Server(){}
 
@@ -63,22 +64,25 @@ void	Server::servLoop(void){
 		poll(&pfds[0], nb_client + 1, 100);
 		for(int i = 0; i < nb_client + 1; i++){
 			if (pfds[i].revents & POLLIN){
-				if (i == 0){
-					struct pollfd newClient;
-					newClient.events = POLLIN;
-					newClient.fd = accept(servSocket, (struct sockaddr *)0, 0);
-					if (newClient.fd == -1) throw acceptFailedException();
-					pfds.push_back(newClient);
+				if (i == 0){ //server
+					struct pollfd newClientpfd;
+					newClientpfd.events = POLLIN;
+					newClientpfd.fd = accept(servSocket, (struct sockaddr *)0, 0);
+					if (newClientpfd.fd == -1) throw acceptFailedException();
+					pfds.push_back(newClientpfd);
+					Client	newClient(newClientpfd);
+					clientMap.insert(std::make_pair(newClientpfd.fd, newClient));
 					nb_client++;
 					IRC_OK("client %d connected", nb_client);
-					send(newClient.fd, WELCOME, sizeof(WELCOME), MSG_DONTWAIT);
+					send(newClientpfd.fd, WELCOME, sizeof(WELCOME), MSG_DONTWAIT);
 				}
 				else{ //TODO C^d (lol)
-					char buffer[255] = {0};
-					int bytes = recv(pfds[i].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
+					int bytes = recv(pfds[i].fd, clientMap.find(pfds[i].fd).get_buffer(), sizeof(clientMap[pfds[i]].get_size()), MSG_DONTWAIT);
 					if (bytes == -1) throw recvFailedException();
 					if (bytes == 0){
 						pfds.erase(pfds.begin() + i);
+						clientMap.erase(pfds[i].fd);
+						IRC_LOG("Actual size of the map = %lu", clientMap.size());
 						nb_client--;
 						IRC_WARN("client %i disconnected", i);
 						i--;

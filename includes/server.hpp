@@ -6,15 +6,11 @@
  *
  *
  * TODO:
- * [ ] - Initialisation
- * [ ] - Listen
- * [ ] - Receive
  * [ ] - Analyse
  * [ ] - Send
- * [ ] - Handle disconnect
- * [ ] - Handle Signals
 */
 
+#include "client.hpp"
 #include "macro.hpp"
 #include <iostream>
 # include <poll.h>
@@ -25,6 +21,7 @@
 # include <arpa/inet.h>
 # include <netinet/in.h> 
 #include <vector>
+#include <map>
 
 #define MAX_CLIENT 128
 #define WELCOME "Welcome to Our IRC Chat, Please read the Documentation (RFC 2812)\n"
@@ -47,7 +44,8 @@ class Server{
 		struct sockaddr_in	address;
 		socklen_t		address_len;
 		int				ipServ;
-		std::vector<pollfd> pfds;
+		std::vector<struct pollfd> pfds;
+		std::map<int, Client>	clientMap;
 };
 
 EXCEPTION(socketFailedException, "socket failed");

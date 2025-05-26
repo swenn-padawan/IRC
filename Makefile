@@ -23,6 +23,7 @@ IFLAGS		:=	-I ./includes
 SRCS_DIR	:= srcs
 
 SRCS		:= main.cpp \
+			   client.cpp \
 			   server.cpp \
 
 SRCS		:=	$(addprefix $(SRCS_DIR)/, $(SRCS))
