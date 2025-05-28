@@ -36,6 +36,7 @@ class Server{
 		GETTER(int, port);
 		GETTER(std::string, password);
 		void	servLoop(void);
+		void	addClient(Client client);
 
 	private:
 		int				port;

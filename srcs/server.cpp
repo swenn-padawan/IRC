@@ -1,6 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: stetrel <stetrel@42angouleme.fr>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/27 18:46:12 by stetrel           #+#    #+#             */
+/*   Updated: 2025/05/28 08:48:24 by stetrel          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "server.hpp"
 #include "debug.hpp"
 #include "irc.hpp"
+#include "macro.hpp"
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <utility>
@@ -64,7 +77,8 @@ void	Server::servLoop(void){
 		poll(&pfds[0], nb_client + 1, 100);
 		for(int i = 0; i < nb_client + 1; i++){
 			if (pfds[i].revents & POLLIN){
-				if (i == 0){ //server
+				if (i == 0){
+					//Server::AddClient()
 					struct pollfd newClientpfd;
 					newClientpfd.events = POLLIN;
 					newClientpfd.fd = accept(servSocket, (struct sockaddr *)0, 0);
@@ -76,20 +90,27 @@ void	Server::servLoop(void){
 					IRC_OK("client %d connected", nb_client);
 					send(newClientpfd.fd, WELCOME, sizeof(WELCOME), MSG_DONTWAIT);
 				}
-				else{ //TODO C^d (lol)
-					int bytes = recv(pfds[i].fd, clientMap.find(pfds[i].fd).get_buffer(), sizeof(clientMap[pfds[i]].get_size()), MSG_DONTWAIT);
+				else{ //Server::ReceiveMsg
+					char	recbuffer[255];
+					int bytes = recv(pfds[i].fd, recbuffer, 255, MSG_DONTWAIT);
 					if (bytes == -1) throw recvFailedException();
 					if (bytes == 0){
 						pfds.erase(pfds.begin() + i);
 						clientMap.erase(pfds[i].fd);
-						IRC_LOG("Actual size of the map = %lu", clientMap.size());
 						nb_client--;
 						IRC_WARN("client %i disconnected", i);
 						i--;
 						continue;
 					}
-					buffer[bytes] = '\0';
-					IRC_LOG("client %i send -> %s", i, buffer);
+					recbuffer[bytes] = '\0';
+					std::string tmp_msg = FIND_MSG(i, get_msg()) += std::string(recbuffer);
+					FIND_MSG(i, set_msg(tmp_msg));
+					if (std::string(recbuffer).find_first_of(CRLF) != std::string::npos){
+						//executeCommand
+						IRC_LOG("final string = %s", FIND_MSG(i, get_msg()).c_str());
+					}else{
+						//nothing
+					}
 
 				}
 			}
