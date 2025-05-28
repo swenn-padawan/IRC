@@ -36,13 +36,15 @@ class Server{
 		GETTER(int, port);
 		GETTER(std::string, password);
 		void	servLoop(void);
-		void	addClient(Client client);
+		int		addClient(void);
+		int		executeCommand(Client &client);
 
 	private:
 		int				port;
 		std::string		password;
 		int				servSocket;
 		struct sockaddr_in	address;
+		int				nb_client;
 		socklen_t		address_len;
 		int				ipServ;
 		std::vector<struct pollfd> pfds;

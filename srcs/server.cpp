@@ -6,7 +6,7 @@
 /*   By: stetrel <stetrel@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 18:46:12 by stetrel           #+#    #+#             */
-/*   Updated: 2025/05/28 08:48:24 by stetrel          ###   ########.fr       */
+/*   Updated: 2025/05/28 10:52:38 by stetrel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,12 @@
 #include <utility>
 
 Server::Server(){}
+
+void	sig_handler(int sig){
+	UNUSED(sig);
+	//free
+	throw sigException();
+}
 
 Server::Server(char *port, char *password){
 	IRC_LOG("Server Created");
@@ -48,23 +54,10 @@ Server::Server(char *port, char *password){
 	if (listen(servSocket, SOMAXCONN) == -1)
 		throw listenFailedException();
 	IRC_OK("listen() OK");
-	IRC_OK("Server initialisation OK");
-}
 
-Server::~Server(){
-	IRC_LOG("Server has been deleted");
-}
-
-void	sig_handler(int sig){
-	UNUSED(sig);
-	//free
-	throw sigException();
-}
-
-void	Server::servLoop(void){
 	struct sigaction sig;
-	int	nb_client = 0;
-
+	
+	nb_client = 0;
 	memset(&sig, 0, sizeof(sig));
 	sig.sa_handler = sig_handler;
 	sigemptyset(&sig.sa_mask);
@@ -73,22 +66,22 @@ void	Server::servLoop(void){
 	pfds.resize(nb_client + 1);
 	pfds[0].events = POLLIN;
 	pfds[0].fd = servSocket;
+
+	IRC_OK("Server initialisation OK");
+}
+
+Server::~Server(){
+	IRC_LOG("Server has been deleted");
+}
+
+
+void	Server::servLoop(void){
 	while (1){
 		poll(&pfds[0], nb_client + 1, 100);
 		for(int i = 0; i < nb_client + 1; i++){
 			if (pfds[i].revents & POLLIN){
 				if (i == 0){
-					//Server::AddClient()
-					struct pollfd newClientpfd;
-					newClientpfd.events = POLLIN;
-					newClientpfd.fd = accept(servSocket, (struct sockaddr *)0, 0);
-					if (newClientpfd.fd == -1) throw acceptFailedException();
-					pfds.push_back(newClientpfd);
-					Client	newClient(newClientpfd);
-					clientMap.insert(std::make_pair(newClientpfd.fd, newClient));
-					nb_client++;
-					IRC_OK("client %d connected", nb_client);
-					send(newClientpfd.fd, WELCOME, sizeof(WELCOME), MSG_DONTWAIT);
+					if (addClient() == -1) throw acceptFailedException();
 				}
 				else{ //Server::ReceiveMsg
 					char	recbuffer[255];
@@ -106,8 +99,7 @@ void	Server::servLoop(void){
 					std::string tmp_msg = FIND_MSG(i, get_msg()) += std::string(recbuffer);
 					FIND_MSG(i, set_msg(tmp_msg));
 					if (std::string(recbuffer).find_first_of(CRLF) != std::string::npos){
-						//executeCommand
-						IRC_LOG("final string = %s", FIND_MSG(i, get_msg()).c_str());
+						executeCommand(clientMap.find(pfds[i].fd)->second);
 					}else{
 						//nothing
 					}
@@ -116,4 +108,30 @@ void	Server::servLoop(void){
 			}
 		}
 	}
+}
+
+int	Server::addClient(){
+	//Server::AddClient()
+	struct pollfd newClientpfd;
+
+	newClientpfd.events = POLLIN;
+	newClientpfd.fd = accept(servSocket, (struct sockaddr *)0, 0);
+
+	if (newClientpfd.fd == -1) return (-1);
+
+	pfds.push_back(newClientpfd);
+	Client	newClient(newClientpfd);
+
+	clientMap.insert(std::make_pair(newClientpfd.fd, newClient));
+	nb_client++;
+	IRC_OK("client %d connected", nb_client);
+	send(newClientpfd.fd, WELCOME, sizeof(WELCOME), MSG_DONTWAIT);
+	return (1);
+}
+
+int	Server::executeCommand(Client &client){
+	IRC_LOG("Msg in Execute: %s", client.get_msg().c_str());
+	client.set_msg("\0");
+	IRC_LOG("Executing command...");
+	return (1);
 }
