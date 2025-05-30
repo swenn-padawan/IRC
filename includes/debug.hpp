@@ -34,11 +34,14 @@
 
 # define _IRC_LOG(c, t, msg, ...)	printf(BOLD(COLOR(c,"%8s")) " > " msg "\n", t, ##__VA_ARGS__)
 
+
 #ifdef VERBOSE
+#  define IRC_DEBUG(msg, ...)		_IRC_LOG(BLUE,	   "debug:", msg, ##__VA_ARGS__)
 #  define IRC_LOG(msg, ...)			_IRC_LOG(CYAN,       "log:", msg, ##__VA_ARGS__)
 #  define IRC_WARN(msg, ...)		_IRC_LOG(YELLOW, "warning:", msg, ##__VA_ARGS__)
 #  define IRC_OK(msg, ...)			_IRC_LOG(GREEN,	    "done:", msg, ##__VA_ARGS__)
 # else
+#  define IRC_DEBUG(msg, ...)
 #  define IRC_LOG(msg, ...)
 #  define IRC_WARN(msg, ...)
 #  define IRC_OK(msg, ...)

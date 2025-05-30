@@ -19,33 +19,31 @@
 # include <sys/socket.h>
 # include <unistd.h>
 # include <arpa/inet.h>
-# include <netinet/in.h> 
+# include <netinet/in.h>
 #include <vector>
 #include <map>
 
 #define MAX_CLIENT 128
 #define WELCOME "Welcome to Our IRC Chat, Please read the Documentation (RFC 2812)\n"
 
-class Server{
+class Server
+{
+	GETSET(Server, int, port);
+	GETSET(Server, std::string, password);
+
 	public:
 		Server();
 		Server(char *port, char *password);
 		~Server();
-		SETTER(int, port);
-		SETTER(std::string, password);
-		GETTER(int, port);
-		GETTER(std::string, password);
 		void	servLoop(void);
 		int		addClient(void);
 		int		executeCommand(Client &client);
 
 	private:
-		int				port;
-		std::string		password;
-		int				servSocket;
 		struct sockaddr_in	address;
-		int				nb_client;
 		socklen_t		address_len;
+		int				servSocket;
+		int				nb_client;
 		int				ipServ;
 		std::vector<struct pollfd> pfds;
 		std::map<int, Client>	clientMap;

@@ -5,7 +5,7 @@ Client::Client(){
 
 Client::~Client(){}
 
-Client::Client(struct pollfd _pfd){
-	this->pfd = _pfd;
-	isEmpty = true;
+Client::Client(struct pollfd pfd){
+	_pfd = pfd;
+	_isEmpty = true;
 }

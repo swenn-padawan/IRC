@@ -6,12 +6,13 @@
 /*   By: stetrel <stetrel@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 18:46:12 by stetrel           #+#    #+#             */
-/*   Updated: 2025/05/28 10:52:38 by stetrel          ###   ########.fr       */
+/*   Updated: 2025/05/30 14:43:05 by mykle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 #include "debug.hpp"
+#include "IRCMessage.hpp"
 #include "irc.hpp"
 #include "macro.hpp"
 #include <sys/poll.h>
@@ -35,7 +36,7 @@ Server::Server(char *port, char *password){
 		throw convertionException();
 	set_port(new_port);
 	set_password(password);
-	IRC_LOG("Port = %d | password = %s", this->port, this->password.c_str());
+	IRC_LOG("Port = %d | password = %s", this->_port, this->_password.c_str());
 	servSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (servSocket == -1)
 		throw socketFailedException();
@@ -43,7 +44,7 @@ Server::Server(char *port, char *password){
 	address_len = sizeof(struct sockaddr_in);
 	this->address.sin_family = AF_INET;
 	this->address.sin_addr.s_addr = INADDR_ANY;
-	this->address.sin_port = htons(this->port);
+	this->address.sin_port = htons(this->_port);
 	ipServ = bind(servSocket, (struct sockaddr *)&this->address, address_len);
 	if (ipServ == -1)
 		throw bindFailedException();
@@ -96,7 +97,8 @@ void	Server::servLoop(void){
 						continue;
 					}
 					recbuffer[bytes] = '\0';
-					std::string tmp_msg = FIND_MSG(i, get_msg()) += std::string(recbuffer);
+					std::string tmp_msg = FIND_MSG(i, get_msg());
+					tmp_msg += std::string(recbuffer);
 					FIND_MSG(i, set_msg(tmp_msg));
 					if (std::string(recbuffer).find_first_of(CRLF) != std::string::npos){
 						executeCommand(clientMap.find(pfds[i].fd)->second);
@@ -131,7 +133,18 @@ int	Server::addClient(){
 
 int	Server::executeCommand(Client &client){
 	IRC_LOG("Msg in Execute: %s", client.get_msg().c_str());
+	try {
+		//IRCMessage msg(client.get_msg());
+		//IRC_DEBUG("-- Checking Parsed message --");
+		//IRC_DEBUG("Command: %s", msg.get_command().c_str());
+		//if (!msg.get_prefix().empty()) IRC_DEBUG("Prefix: %s", msg.get_prefix().c_str());
+		//if (!msg.get_nickname().empty()) IRC_DEBUG("Nickname: %s", msg.get_nickname().c_str());
+		//if (!msg.get_username().empty()) IRC_DEBUG("Username: %s", msg.get_username().c_str());
+		//if (!msg.get_hostname().empty()) IRC_DEBUG("Hostname: %s", msg.get_hostname().c_str());
+		//IRC_DEBUG("Params count: %lu", msg.get_params().size());
+		//for (size_t i = 0; i < msg.get_params().size(); ++i)
+		//	IRC_DEBUG("Param[%lu]: %s", i, msg.get_param(i).c_str());
+	} IRC_CATCH;
 	client.set_msg("\0");
-	IRC_LOG("Executing command...");
 	return (1);
 }

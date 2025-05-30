@@ -14,21 +14,15 @@
 
 #define	COMMA	,
 
-class Client{
+class Client
+{
+	GETSET(Client, std::string, msg);
+	GETTER(struct pollfd, pfd);
+	GETTER(size_t, size);
+	GETTER(bool, isEmpty);
+
 	public:
 		Client();
 		Client(struct pollfd _pfd);
-		GETTER(struct pollfd, pfd);
-		GETTER(std::string, msg);
-		GETTER(size_t, _size);
-		GETTER(bool, isEmpty);
-		SETTER(std::string, msg);
-//		GETTER(map<int COMMA int>, _map)
 		~Client();
-	private:
-
-		std::string		msg;
-		struct pollfd	pfd;
-		bool			isEmpty;
-		size_t			_size;
 };
