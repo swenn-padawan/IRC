@@ -1,11 +1,18 @@
 #pragma once
 
-/*@brief: Generate automatically a getter/setter funcs*/
-# define GETTER(field_type, field_name) \
-	field_type get_##field_name() const {return field_name;}
+#define GETSET(cls, type, var, ...) \
+	private: type _##var; \
+	public: \
+	const type& get_##var() const {return _##var;} \
+	cls& set_##var(const type& val) {_##var = val; __VA_ARGS__ return *this;} \
 
-# define SETTER(field_type, field_name) \
-    void set_##field_name(field_type value) { field_name = value; }
+#define GETTER(type, var) \
+	private: type _##var; \
+	public: const type& get_##var() const {return _##var;} \
+
+#define SETTER(cls, type, var, ...) \
+	private: type _##var; \
+	public: cls& set_##var(type val) {_##var = val; __VA_ARGS__ return *this;} \
 
 # define UNUSED(x) ((void)x)
 

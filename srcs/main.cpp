@@ -1,5 +1,6 @@
 #include "debug.hpp"
 #include "irc.hpp"
+#include "IRCMessage.hpp"
 
 /* @Usage:
  * /ircserv <port> <password>
