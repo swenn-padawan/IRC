@@ -23,6 +23,8 @@ IFLAGS		:=	-I includes
 SRCS_DIR	:= srcs
 
 SRCS		:= main.cpp \
+			   client.cpp \
+			   server.cpp \
 			   IRCMessage.cpp \
 
 SRCS		:=	$(addprefix $(SRCS_DIR)/, $(SRCS))
@@ -43,20 +45,20 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@$(CC) $(CFLAGS) $(OBJS) -o $@
-	@echo " $(GREEN)$(BOLD)$(ITALIC)■$(RESET)  building	$(GREEN)$(BOLD)$(ITALIC)$(NAME)$(RESET)"
+	@echo -e " $(GREEN)$(BOLD)$(ITALIC)■$(RESET)  building	$(GREEN)$(BOLD)$(ITALIC)$(NAME)$(RESET)"
 
 $(BUILD)/%.o: %.cpp
 	@$(DIR_UP)
-	@echo " $(CYAN)$(BOLD)$(ITALIC)■$(RESET)  compiling	$(GRAY)$(BOLD)$(ITALIC)$^$(RESET)"
+	@echo -e " $(CYAN)$(BOLD)$(ITALIC)■$(RESET)  compiling	$(GRAY)$(BOLD)$(ITALIC)$^$(RESET)"
 	@$(CC) $(CFLAGS) $(IFLAGS) -o $@ -c $<
 
 clean:
 	@$(RM) $(BUILD)
-	@echo " $(RED)$(BOLD)$(ITALIC)■$(RESET)  deleting	$(RED)$(BOLD)$(ITALIC)$(BUILD)$(RESET)"
+	@echo -e " $(RED)$(BOLD)$(ITALIC)■$(RESET)  deleting	$(RED)$(BOLD)$(ITALIC)$(BUILD)$(RESET)"
 
 fclean: clean
 	@$(RM) $(NAME)
-	@echo " $(RED)$(BOLD)$(ITALIC)■$(RESET)  deleting	$(RED)$(BOLD)$(ITALIC)$(NAME)$(RESET)"
+	@echo -e " $(RED)$(BOLD)$(ITALIC)■$(RESET)  deleting	$(RED)$(BOLD)$(ITALIC)$(NAME)$(RESET)"
 
 re: fclean all
 

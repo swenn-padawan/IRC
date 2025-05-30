@@ -11,7 +11,8 @@
 	public: const type& get_##var() const {return _##var;} \
 
 #define SETTER(cls, type, var, ...) \
-	cls& set_##var(type val) {_##var = val; __VA_ARGS__ return *this;} \
+	private: type _##var; \
+	public: cls& set_##var(type val) {_##var = val; __VA_ARGS__ return *this;} \
 
 # define UNUSED(x) ((void)x)
 
@@ -20,3 +21,8 @@
 
 # define EXCEPTION(n, m)	class n:public std::exception { inline const char *what() const throw() { return (m) ; } ; }
 
+# define FIND_MSG(i, func) clientMap.find(pfds[i].fd)->second.func
+
+# define CRLF "\r\n"
+
+# define BUFFER_SIZE 3000
