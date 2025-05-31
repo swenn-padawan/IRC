@@ -75,8 +75,7 @@ bool IRCMessage::parseParams(const std::string &str, size_t& pos)
 		size_t param_end = str.find_first_of(CHARSET_SEPARATOR, pos);
 		if (param_end > pos)
 			_params.push_back(str.substr(pos, param_end - pos));
-		pos = str.find_first_not_of(CHAR_SPACE, param_end);
-		// Check for trailing parameter (starts with ':')
+		pos = str.find_first_not_of("\r\n \0", param_end);
 		if (str[pos] == CHAR_TRAILING)
 		{
 			_params.push_back(str.substr(++pos));
