@@ -6,7 +6,7 @@
 /*   By: stetrel <stetrel@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 18:46:12 by stetrel           #+#    #+#             */
-/*   Updated: 2025/05/30 14:43:05 by mykle            ###   ########.fr       */
+/*   Updated: 2025/05/31 10:26:23 by stetrel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,12 @@ Server::Server(char *port, char *password){
 
 Server::~Server(){
 	IRC_LOG("Server has been deleted");
+	IRC_LOG("nb_client = %d", nb_client);
+	close(servSocket);
+	for (std::map<int, Client>::iterator it = clientMap.begin(); it != clientMap.end(); ++it) {
+		int fd = it->second.get_pfd().fd;
+		close(fd);
+	}
 }
 
 
@@ -85,12 +91,13 @@ void	Server::servLoop(void){
 					if (addClient() == -1) throw acceptFailedException();
 				}
 				else{ //Server::ReceiveMsg
-					char	recbuffer[255];
+					char	recbuffer[256];
 					int bytes = recv(pfds[i].fd, recbuffer, 255, MSG_DONTWAIT);
 					if (bytes == -1) throw recvFailedException();
 					if (bytes == 0){
 						pfds.erase(pfds.begin() + i);
 						clientMap.erase(pfds[i].fd);
+						close(pfds[i].fd);
 						nb_client--;
 						IRC_WARN("client %i disconnected", i);
 						i--;
@@ -102,10 +109,7 @@ void	Server::servLoop(void){
 					FIND_MSG(i, set_msg(tmp_msg));
 					if (std::string(recbuffer).find_first_of(CRLF) != std::string::npos){
 						executeCommand(clientMap.find(pfds[i].fd)->second);
-					}else{
-						//nothing
 					}
-
 				}
 			}
 		}
@@ -115,6 +119,8 @@ void	Server::servLoop(void){
 int	Server::addClient(){
 	//Server::AddClient()
 	struct pollfd newClientpfd;
+
+	memset(&newClientpfd, 0, sizeof(newClientpfd));
 
 	newClientpfd.events = POLLIN;
 	newClientpfd.fd = accept(servSocket, (struct sockaddr *)0, 0);
