@@ -20,12 +20,6 @@
 # include "macro.hpp"
 # include "server.hpp"
 # include "client.hpp"
+# include "IRCMessage.hpp"
 # include "debug.hpp"
-#include <errno.h>
-#include <climits>
-#include <cstdlib>
-#include <fcntl.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <string.h>
-
+# include "errTable.hpp"

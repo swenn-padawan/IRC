@@ -8,18 +8,19 @@
 */
 
 #include "macro.hpp"
+
 #include <poll.h>
 #include <cstdlib>
 #include <string>
 
-#define	COMMA	,
-
 class Client
 {
-	GETSET(Client, std::string, msg);
-	GETTER(struct pollfd, pfd);
-	GETTER(size_t, size);
-	GETTER(bool, isEmpty);
+	GETSET(Client, std::string, msg)
+	GETSET(Client, std::string, nickname)
+	GETSET(Client, std::string, username)
+	GETTER(struct pollfd, pfd)
+	GETTER(size_t, size)
+	GETTER(bool, isEmpty)
 
 	public:
 		Client();

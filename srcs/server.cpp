@@ -6,7 +6,7 @@
 /*   By: stetrel <stetrel@42angouleme.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 18:46:12 by stetrel           #+#    #+#             */
-/*   Updated: 2025/05/31 10:26:23 by stetrel          ###   ########.fr       */
+/*   Updated: 2025/05/31 10:36:42 by mrouves          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,16 +140,16 @@ int	Server::addClient(){
 int	Server::executeCommand(Client &client){
 	IRC_LOG("Msg in Execute: %s", client.get_msg().c_str());
 	try {
-		//IRCMessage msg(client.get_msg());
-		//IRC_DEBUG("-- Checking Parsed message --");
-		//IRC_DEBUG("Command: %s", msg.get_command().c_str());
-		//if (!msg.get_prefix().empty()) IRC_DEBUG("Prefix: %s", msg.get_prefix().c_str());
-		//if (!msg.get_nickname().empty()) IRC_DEBUG("Nickname: %s", msg.get_nickname().c_str());
-		//if (!msg.get_username().empty()) IRC_DEBUG("Username: %s", msg.get_username().c_str());
-		//if (!msg.get_hostname().empty()) IRC_DEBUG("Hostname: %s", msg.get_hostname().c_str());
-		//IRC_DEBUG("Params count: %lu", msg.get_params().size());
-		//for (size_t i = 0; i < msg.get_params().size(); ++i)
-		//	IRC_DEBUG("Param[%lu]: %s", i, msg.get_param(i).c_str());
+		IRCMessage msg(client.get_msg());
+		IRC_DEBUG("-- Checking Parsed message --");
+		IRC_DEBUG("Command: %s", msg.get_command().c_str());
+		if (!msg.get_prefix().empty()) IRC_DEBUG("Prefix: %s", msg.get_prefix().c_str());
+		if (!msg.get_nickname().empty()) IRC_DEBUG("Nickname: %s", msg.get_nickname().c_str());
+		if (!msg.get_username().empty()) IRC_DEBUG("Username: %s", msg.get_username().c_str());
+		if (!msg.get_hostname().empty()) IRC_DEBUG("Hostname: %s", msg.get_hostname().c_str());
+		IRC_DEBUG("Params count: %lu", msg.get_params().size());
+		for (size_t i = 0; i < msg.get_params().size(); ++i)
+			IRC_DEBUG("Param[%lu]: %s", i, msg.get_param(i).c_str());
 	} IRC_CATCH;
 	client.set_msg("\0");
 	return (1);

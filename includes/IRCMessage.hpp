@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <cctype>
 #include <iostream>
 
 #include "macro.hpp"
@@ -13,6 +12,7 @@
 #define CHARSET_CRLF "\r\n\0"
 #define CHARSET_SEPARATOR "\r\n: \0"
 #define CHARSET_LETTERS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+
 /**
  * @class IRCMessage
  * @brief Represents a parsed IRC protocol message

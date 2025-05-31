@@ -63,8 +63,8 @@ bool IRCMessage::parseCommand(const std::string &str, size_t& pos)
 	if (pos == cmd_end)
 		return false;
 	_command = str.substr(pos, cmd_end - pos);
-	pos = str.find_first_not_of(CHARSET_SEPARATOR, cmd_end);
-	return (pos != cmd_end || pos == std::string::npos);
+	pos = cmd_end;
+	return (true);
 }
 
 bool IRCMessage::parseParams(const std::string &str, size_t& pos)

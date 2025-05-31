@@ -12,24 +12,31 @@
 
 #include "client.hpp"
 #include "macro.hpp"
+
+#include <errno.h>
+#include <string.h>
 #include <iostream>
-# include <poll.h>
-# include <signal.h>
+#include <signal.h>
+#include <fcntl.h>
+#include <poll.h>
 #include <sys/poll.h>
-# include <sys/socket.h>
-# include <unistd.h>
-# include <arpa/inet.h>
-# include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <vector>
 #include <map>
+#include <cstdlib>
+#include <climits>
 
 #define MAX_CLIENT 128
 #define WELCOME "Welcome to Our IRC Chat, Please read the Documentation (RFC 2812)\n"
 
 class Server
 {
-	GETSET(Server, int, port);
-	GETSET(Server, std::string, password);
+	GETSET(Server, int, port)
+	GETSET(Server, std::string, password)
+	GETTER(std::map<std::string COMMA std::vector<const Client*> >, chanelsMap)
 
 	public:
 		Server();
