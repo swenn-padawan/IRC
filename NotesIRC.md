@@ -111,14 +111,18 @@ et dans ce cas la le prefixe est le serveur est pas le user.
 Je n'ecrirais pas tout les codes d'erreurs de chaque commandes, ils sont disponibles a partir de la page16  
 
 Toutes les commandes a recoder:  
-JOIN  
-MODE  
-KICK  
-PART  
-QUIT 
-PRIVMSG  
-NOTICE  (optionel)   
-TOPIC   (optionel)  
+- [ ] JOIN
+- [ ] USER
+- [ ] NICK
+- [ ] PASS
+- [ ] INVITE
+- [ ] MODE  
+- [ ] KICK  
+- [ ] PART  
+- [ ] QUIT   
+- [ ] PRIVMSG
+- [ ] TOPIC  
+- [ ] NOTICE  (optionel)   
 
 ##### 3.2.1 JOIN message
 
